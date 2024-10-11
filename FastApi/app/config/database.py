@@ -2,11 +2,16 @@
 Module for defining database models using the Peewee ORM.
 """
 from dotenv import load_dotenv
-from peewee import *
+from peewee import (
+    AutoField, CharField, ForeignKeyField, IntegerField,
+    Model, TextField, MySQLDatabase
+)
 from config.settings import DATABASE
 
+# Load environment variables from a .env file
 load_dotenv()
 
+# MySQL database configuration
 database = MySQLDatabase(
     DATABASE["name"],
     user=DATABASE["user"],
@@ -15,219 +20,200 @@ database = MySQLDatabase(
     port=DATABASE["port"],
 )
 
+# pylint: disable=too-few-public-methods
+
 class UserModel(Model):
-    id = AutoField(primary_key=True)
-    cc = CharField(max_length=20)
-    name = CharField(max_length=50)
-    lastName = CharField(max_length=50)
-    password = CharField(max_length=50)
-    email = CharField(max_length=50)
-    phoneNumber = CharField(max_length=50)
-    role = IntegerField()
-    
+    """Model for representing a user in the system."""
+    id = AutoField(primary_key=True)           # Unique identifier for the user
+    cc = CharField(max_length=20)              # ID card number
+    name = CharField(max_length=50)            # User's name
+    lastName = CharField(max_length=50)        # User's last name
+    password = CharField(max_length=50)        # User's password
+    email = CharField(max_length=50)           # User's email address
+    phoneNumber = CharField(max_length=50)     # Phone number
+    role = IntegerField()                       # User's role (e.g., 0=user, 1=admin)
 
     class Meta:
         database = database
         table_name = "user"
 
 class RecipeModel(Model):
-    """Model representing a Recipe."""
-    id = AutoField(primary_key=True)
-    name = CharField(max_length=50)
-    typeOfFood = CharField(max_length=50)
-    preparationTime = IntegerField()
-    nutritionalInfoId = IntegerField()
-    images = TextField()
-    preparationProcess = CharField(max_length=50)
-    
+    """Model representing a recipe."""
+    id = AutoField(primary_key=True)            # Unique identifier for the recipe
+    name = CharField(max_length=50)             # Name of the recipe
+    typeOfFood = CharField(max_length=50)       # Type of food
+    preparationTime = IntegerField()             # Preparation time in minutes
+    nutritionalInfoId = IntegerField()          # Nutritional information ID
+    images = TextField()                         # Recipe image URLs
+    preparationProcess = CharField(max_length=50) # Preparation process
 
     class Meta:
-        """Class defining properties of the RecipeModel."""
         database = database
         table_name = "recipe"
 
-
-
 class FoodModel(Model):
-    """Model representing an Food."""
-    id = AutoField(primary_key=True)
-    name = CharField(max_length=50)
-    macronutrientsId =  IntegerField()
-    micronutrientsId = IntegerField()
+    """Model representing a food item."""
+    id = AutoField(primary_key=True)            # Unique identifier for the food item
+    name = CharField(max_length=50)             # Name of the food item
+    macronutrientsId = IntegerField()            # Macronutrients ID
+    micronutrientsId = IntegerField()            # Micronutrients ID
 
     class Meta:
-        """Class defining properties of the Food model."""
         database = database
         table_name = "food"
 
 class IngredientModel(Model):
-    """Model representing a book."""
-    id = AutoField(primary_key=True)
-    foodId = ForeignKeyField(FoodModel, backref="food")
-    quantity = IntegerField()
-    measurementUnit = CharField(max_length=50)
-    expirationDate = CharField(max_length=50)
-    meassure = IntegerField()
-    
-    
+    """Model representing an ingredient."""
+    id = AutoField(primary_key=True)            # Unique identifier for the ingredient
+    foodId = ForeignKeyField(FoodModel, backref="food")  # Associated food ID
+    quantity = IntegerField()                    # Quantity of the ingredient
+    measurementUnit = CharField(max_length=50)   # Measurement unit
+    expirationDate = CharField(max_length=50)    # Expiration date
+    measure = IntegerField()                     # Measure
 
     class Meta:
-        """Class defining properties of the BookModel."""
         database = database
         table_name = "ingredient"
 
- 
 class MeasureModel(Model):
-    """Model representing the relationship between authors and books."""
-    id = AutoField(primary_key=True)
-    name = CharField(max_length=50)
+    """Model representing measurement units."""
+    id = AutoField(primary_key=True)            # Unique identifier for the measure
+    name = CharField(max_length=50)             # Name of the measure
 
     class Meta:
-        """Class defining properties of the AuthorBook model."""
         database = database
         table_name = "measure"
 
 class NotificationModel(Model):
-    id = AutoField(primary_key=True)
-    userId = ForeignKeyField(UserModel, backref="user")
-    message = CharField(max_length=50)
-    dateSent = CharField(max_length=20)
-    type = CharField(max_length=20)
+    """Model representing a notification."""
+    id = AutoField(primary_key=True)            # Unique identifier for the notification
+    userId = ForeignKeyField(UserModel, backref="user")  # Associated user ID
+    message = CharField(max_length=50)          # Notification message
+    dateSent = CharField(max_length=20)         # Date sent
+    type = CharField(max_length=20)              # Type of notification
 
     class Meta:
-
         database = database
         table_name = "notification"
 
-
-
 class NutritionalInfoModel(Model):
-    id = AutoField(primary_key=True)
-    calories = IntegerField()
-    carbohydrates = IntegerField()
-    proteins = IntegerField()
-    fats = IntegerField
-    vitamins = CharField(max_length=50)
-    minerals = CharField(max_length=50)
+    """Model representing nutritional information."""
+    id = AutoField(primary_key=True)            # Unique identifier for the nutritional information
+    calories = IntegerField()                    # Calories
+    carbohydrates = IntegerField()               # Carbohydrates
+    proteins = IntegerField()                    # Proteins
+    fats = IntegerField()                        # Fats
+    vitamins = CharField(max_length=50)         # Vitamins
+    minerals = CharField(max_length=50)         # Minerals
 
     class Meta:
-
         database = database
         table_name = "nutritionalInfo"
 
-
-
 class PantryModel(Model):
-    id = AutoField(primary_key=True)
-    userId = ForeignKeyField(UserModel, backref="user")
-    ingredientIds = ForeignKeyField(IngredientModel, backref="ingredient")
-    dateLastUpdated = CharField(max_length=50)
-   
+    """Model representing a user's pantry."""
+    id = AutoField(primary_key=True)            # Unique identifier for the pantry
+    userId = ForeignKeyField(UserModel, backref="user")  # Associated user ID
+    ingredientIds = ForeignKeyField(IngredientModel, backref="ingredient")  # Ingredient IDs
+    dateLastUpdated = CharField(max_length=50)  # Last updated date
 
     class Meta:
-
         database = database
         table_name = "pantry"
 
-
-
 class PurchaseHistoryModel(Model):
-    id = AutoField(primary_key=True)
-    userId = ForeignKeyField(UserModel, backref="user")
-    ingredientsId = ForeignKeyField(IngredientModel, backref="ingredient")
-    purchaseDate = CharField(max_length=50)
+    """Model representing a user's purchase history."""
+    id = AutoField(primary_key=True)            # Unique identifier for the history
+    userId = ForeignKeyField(UserModel, backref="user")  # Associated user ID
+    ingredientsId = ForeignKeyField(IngredientModel, backref="ingredient")  # Purchased ingredient IDs
+    purchaseDate = CharField(max_length=50)     # Purchase date
 
     class Meta:
-
         database = database
         table_name = "purchaseHistory"
 
-
-
 class RecipeSuggestionModel(Model):
-    id = AutoField(primary_key=True)
-    userId = ForeignKeyField(UserModel, backref="books")
-    suggestedRecipeId = ForeignKeyField(RecipeModel, backref="books")
-    matchedIngredientId= ForeignKeyField(IngredientModel, backref="ingredient")
-    missingIngredientesId = ForeignKeyField(IngredientModel, backref="ingredient")
-    dateSuggested = CharField(max_length=50)
-
+    """Model for recipe suggestions."""
+    id = AutoField(primary_key=True)            # Unique identifier for the suggestion
+    userId = ForeignKeyField(UserModel, backref="books")  # User ID receiving the suggestion
+    suggestedRecipeId = ForeignKeyField(RecipeModel, backref="books")  # Suggested recipe ID
+    matchedIngredientId = ForeignKeyField(IngredientModel, backref="ingredient")  # Matched ingredient ID
+    missingIngredientesId = ForeignKeyField(IngredientModel, backref="ingredient")  # Missing ingredients IDs
+    dateSuggested = CharField(max_length=50)    # Date of the suggestion
 
     class Meta:
-
         database = database
         table_name = "recipeSuggestion"
 
 class RolesModel(Model):
-    id = AutoField(primary_key=True)
-    roleName = CharField(max_length=50)
+    """Model representing user roles."""
+    id = AutoField(primary_key=True)            # Unique identifier for the role
+    roleName = CharField(max_length=50)         # Role name
 
     class Meta:
         database = database
         table_name = "roles"
 
-
 class ShoppingListModel(Model):
-    id = AutoField(primary_key=True)
-    userId = ForeignKeyField(UserModel, backref="books")
-    ingredientId = ForeignKeyField(IngredientModel,backref="books")
-    dateCreated = CharField(max_length=20)
+    """Model representing a shopping list."""
+    id = AutoField(primary_key=True)            # Unique identifier for the list
+    userId = ForeignKeyField(UserModel, backref="books")  # Associated user ID
+    ingredientId = ForeignKeyField(IngredientModel, backref="books")  # Ingredient ID
+    dateCreated = CharField(max_length=20)      # Creation date of the list
 
     class Meta:
         database = database
         table_name = "shoppingList"
 
- 
 class StoreModel(Model):
-    id = AutoField(primary_key=True)
-    name = CharField(max_length=50)
-    location = CharField(max_length=20)
-    inventoryId = ForeignKeyField(PantryModel,backref="pantry")
+    """Model representing a store."""
+    id = AutoField(primary_key=True)            # Unique identifier for the store
+    name = CharField(max_length=50)             # Store name
+    location = CharField(max_length=20)         # Store location
+    inventoryId = ForeignKeyField(PantryModel, backref="pantry")  # Associated pantry ID
 
     class Meta:
         database = database
         table_name = "store"
 
-
 class UserPreferencesModel(Model):
-    id = AutoField(primary_key=True)
-    userId = ForeignKeyField(UserModel, backref="user")
-    dietaryRestrictions = CharField(max_length=50)
-    preferredCuisines = CharField(max_length=50)
-    allergens = CharField(max_length=50)
-    
-    
+    """Model representing user preferences."""
+    id = AutoField(primary_key=True)            # Unique identifier for the preferences
+    userId = ForeignKeyField(UserModel, backref="user")  # Associated user ID
+    dietaryRestrictions = CharField(max_length=50)  # Dietary restrictions
+    preferredCuisines = CharField(max_length=50)   # Preferred cuisines
+    allergens = CharField(max_length=50)           # Allergens
 
     class Meta:
         database = database
         table_name = "userPreferences"
 
 class WeeklyMenuModel(Model):
-    id = AutoField(primary_key=True)
+    """Model representing a weekly menu."""
+    id = AutoField(primary_key=True)            # Unique identifier for the weekly menu
 
     class Meta:
         database = database
         table_name = "weeklyMenu"
 
 class MenuHistoryModel(Model):
-    id = AutoField(primary_key=True)
-    userId = ForeignKeyField(UserModel, backref="user")
-    weeklyMenuId = ForeignKeyField(WeeklyMenuModel, backref="weeklyMenu")
-    dateCreated = CharField(max_length=20)
+    """Model representing a user's menu history."""
+    id = AutoField(primary_key=True)            # Unique identifier for the history
+    userId = ForeignKeyField(UserModel, backref="user")  # Associated user ID
+    weeklyMenuId = ForeignKeyField(WeeklyMenuModel, backref="weeklyMenu")  # Weekly menu ID
+    dateCreated = CharField(max_length=20)      # Creation date of the history
 
     class Meta:
-
         database = database
         table_name = "menuHistory"
-        
+
 class MenuModel(Model):
-    """Model representing the relationship between cameras and cellphones."""
+    """Model representing the relationship between menus and recipes."""
     id = AutoField(primary_key=True)
     weeklyMenuId = ForeignKeyField(WeeklyMenuModel, backref="weeklyMenu")
     day = CharField(max_length=10)
     hour = CharField(max_length=20)
     type = CharField(max_length=20)
-
 
     class Meta:
         """Class defining properties of the Menu model."""
@@ -235,58 +221,61 @@ class MenuModel(Model):
         table_name = "menu"
 
 class FavoriteRecipe(Model):
-    userId = ForeignKeyField(UserModel, backref="recipes")
-    recipeId = ForeignKeyField(RecipeModel, backref="users")
+    """Model representing users' favorite recipes."""
+    id = AutoField(primary_key=True)            # Unique identifier for the favorite recipe
+    userId = ForeignKeyField(UserModel, backref="recipes")  # User ID marking the recipe as favorite
+    recipeId = ForeignKeyField(RecipeModel, backref="recipes")  # Recipe ID marked as favorite
 
     class Meta:
         database = database
         table_name = "favoriteRecipe"
 
 class RecipeIngredient(Model):
-    recipeId = ForeignKeyField(RecipeModel, backref="ingredient")
-    ingredientId = ForeignKeyField(IngredientModel, backref="recipe")
+    """Model representing the ingredients of a recipe."""
+    recipeId = ForeignKeyField(RecipeModel, backref="ingredient")  # ID of the associated recipe
+    ingredientId = ForeignKeyField(IngredientModel, backref="recipe")  # ID of the ingredient
 
     class Meta:
         database = database
         table_name = "favoriteRecipe"
 
 class MenuRecipe(Model):
-    menuId = ForeignKeyField(MenuModel,backref="recipe")
-    recipeId = ForeignKeyField(RecipeModel,backref="menu")
+    """Model representing the relationship between menus and recipes."""
+    menuId = ForeignKeyField(MenuModel, backref="recipe")  # ID of the associated menu
+    recipeId = ForeignKeyField(RecipeModel, backref="menu")  # ID of the associated recipe
 
     class Meta:
         database = database
         table_name = "menuRecipe"
 
-
 class GroupModel(Model):
-    """Model representing a book."""
-    id = AutoField(primary_key=True)
-    name = CharField(max_length=50)
-    adminId = ForeignKeyField(UserModel, backref="user")
-    weeklyMenuId = ForeignKeyField(WeeklyMenuModel, backref="weeklyMenu")
-    
+    """Model representing a group of users."""
+    id = AutoField(primary_key=True)            # Unique identifier for the group
+    name = CharField(max_length=50)             # Name of the group
+    adminId = ForeignKeyField(UserModel, backref="user")  # ID of the group's administrator
+    weeklyMenuId = ForeignKeyField(WeeklyMenuModel, backref="weeklyMenu")  # ID of the associated weekly menu
 
     class Meta:
-        """Class defining properties of the BookModel."""
         database = database
         table_name = "group"
 
 class GroupMembers(Model):
-    groupId = ForeignKeyField(GroupModel,backref="user")
-    userId = ForeignKeyField(UserModel,backref="group")
+    """Model representing the relationship between groups and members."""
+    groupId = ForeignKeyField(GroupModel, backref="user")  # ID of the associated group
+    userId = ForeignKeyField(UserModel, backref="group")    # ID of the associated user
 
     class Meta:
         database = database
         table_name = "menuRecipe"
+
 class CommentModel(Model):
-    """Model representing a Comment."""
-    id = AutoField(primary_key=True)
-    recipeId = ForeignKeyField(RecipeModel, backref="comments")  
-    userId = ForeignKeyField(UserModel, backref="comments")  
-    content = TextField()
-    rating = IntegerField()
-    datePosted = CharField(max_length=10)
+    """Model representing a comment."""
+    id = AutoField(primary_key=True)            # Unique identifier for the comment
+    recipeId = ForeignKeyField(RecipeModel, backref="comments")  # ID of the commented recipe
+    userId = ForeignKeyField(UserModel, backref="comments")      # ID of the user who commented
+    content = TextField()                        # Content of the comment
+    rating = IntegerField()                      # Rating of the comment
+    datePosted = CharField(max_length=10)       # Date the comment was posted
 
     class Meta:
         database = database
