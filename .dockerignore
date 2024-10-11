@@ -5,3 +5,5 @@ venv
 Dockerfile
 docker-compose.yml
 __pycache__
+alembic
+alembic.ini

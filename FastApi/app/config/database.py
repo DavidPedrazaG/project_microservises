@@ -15,21 +15,20 @@ database = MySQLDatabase(
     port=DATABASE["port"],
 )
 
-class CommentModel(Model):
-    """Model representing a Comment."""
+class UserModel(Model):
     id = AutoField(primary_key=True)
-    recipeId = ForeignKeyField('RecipeModel', backref="comments")  
-    userId = ForeignKeyField('UserModel', backref="comments")  
-    content = TextField()
-    rating = IntegerField()
-    datePosted = CharField(max_length=10)
+    cc = CharField(max_length=20)
+    name = CharField(max_length=50)
+    lastName = CharField(max_length=50)
+    password = CharField(max_length=50)
+    email = CharField(max_length=50)
+    phoneNumber = CharField(max_length=50)
+    role = IntegerField()
+    
 
     class Meta:
         database = database
-        table_name = "comment"
-
-
-       
+        table_name = "user"
 
 class RecipeModel(Model):
     """Model representing a Recipe."""
@@ -61,27 +60,10 @@ class FoodModel(Model):
         database = database
         table_name = "food"
 
-      
-
-class GroupModel(Model):
-    """Model representing a book."""
-    id = AutoField(primary_key=True)
-    name = CharField(max_length=50)
-    adminId = ForeignKeyField('UserModel', backref="user")
-    weeklyMenuId = ForeignKeyField('WeeklyMenuModel', backref="weeklyMenu")
-    
-
-    class Meta:
-        """Class defining properties of the BookModel."""
-        database = database
-        table_name = "group"
-
-
-
 class IngredientModel(Model):
     """Model representing a book."""
     id = AutoField(primary_key=True)
-    foodId = ForeignKeyField('FoodModel', backref="food")
+    foodId = ForeignKeyField(FoodModel, backref="food")
     quantity = IntegerField()
     measurementUnit = CharField(max_length=50)
     expirationDate = CharField(max_length=50)
@@ -105,38 +87,9 @@ class MeasureModel(Model):
         database = database
         table_name = "measure"
 
-
-class MenuModel(Model):
-    """Model representing the relationship between cameras and cellphones."""
-    id = AutoField(primary_key=True)
-    weeklyMenuId = ForeignKeyField('WeeklyMenuModel', backref="weeklyMenu")
-    day = CharField(max_length=10)
-    hour = CharField(max_length=20)
-    type = CharField(max_length=20)
-
-
-    class Meta:
-        """Class defining properties of the Menu model."""
-        database = database
-        table_name = "menu"
-
-
-class MenuHistoryModel(Model):
-    id = AutoField(primary_key=True)
-    userId = ForeignKeyField('UserModel', backref="user")
-    weeklyMenuId = ForeignKeyField('WeeklyMenuModel', backref="weeklyMenu")
-    dateCreated = CharField(max_length=20)
-
-    class Meta:
-
-        database = database
-        table_name = "menuHistory"
-        
-
-
 class NotificationModel(Model):
     id = AutoField(primary_key=True)
-    userId = ForeignKeyField('UserModel', backref="user")
+    userId = ForeignKeyField(UserModel, backref="user")
     message = CharField(max_length=50)
     dateSent = CharField(max_length=20)
     type = CharField(max_length=20)
@@ -166,7 +119,7 @@ class NutritionalInfoModel(Model):
 
 class PantryModel(Model):
     id = AutoField(primary_key=True)
-    userId = ForeignKeyField('UserModel', backref="user")
+    userId = ForeignKeyField(UserModel, backref="user")
     ingredientIds = ForeignKeyField(IngredientModel, backref="ingredient")
     dateLastUpdated = CharField(max_length=50)
    
@@ -180,7 +133,7 @@ class PantryModel(Model):
 
 class PurchaseHistoryModel(Model):
     id = AutoField(primary_key=True)
-    userId = ForeignKeyField('UserModel', backref="user")
+    userId = ForeignKeyField(UserModel, backref="user")
     ingredientsId = ForeignKeyField(IngredientModel, backref="ingredient")
     purchaseDate = CharField(max_length=50)
 
@@ -193,7 +146,7 @@ class PurchaseHistoryModel(Model):
 
 class RecipeSuggestionModel(Model):
     id = AutoField(primary_key=True)
-    userId = ForeignKeyField('UserModel', backref="books")
+    userId = ForeignKeyField(UserModel, backref="books")
     suggestedRecipeId = ForeignKeyField(RecipeModel, backref="books")
     matchedIngredientId= ForeignKeyField(IngredientModel, backref="ingredient")
     missingIngredientesId = ForeignKeyField(IngredientModel, backref="ingredient")
@@ -216,7 +169,7 @@ class RolesModel(Model):
 
 class ShoppingListModel(Model):
     id = AutoField(primary_key=True)
-    userId = ForeignKeyField('UserModel', backref="books")
+    userId = ForeignKeyField(UserModel, backref="books")
     ingredientId = ForeignKeyField(IngredientModel,backref="books")
     dateCreated = CharField(max_length=20)
 
@@ -236,24 +189,6 @@ class StoreModel(Model):
         table_name = "store"
 
 
-
-class UserModel(Model):
-    id = AutoField(primary_key=True)
-    cc = CharField(max_length=20)
-    name = CharField(max_length=50)
-    lastName = CharField(max_length=50)
-    password = CharField(max_length=50)
-    email = CharField(max_length=50)
-    phoneNumber = CharField(max_length=50)
-    role = IntegerField()
-    
-
-    class Meta:
-        database = database
-        table_name = "user"
-
-
-
 class UserPreferencesModel(Model):
     id = AutoField(primary_key=True)
     userId = ForeignKeyField(UserModel, backref="user")
@@ -269,12 +204,35 @@ class UserPreferencesModel(Model):
 
 class WeeklyMenuModel(Model):
     id = AutoField(primary_key=True)
-    
-    
 
     class Meta:
         database = database
         table_name = "weeklyMenu"
+
+class MenuHistoryModel(Model):
+    id = AutoField(primary_key=True)
+    userId = ForeignKeyField(UserModel, backref="user")
+    weeklyMenuId = ForeignKeyField(WeeklyMenuModel, backref="weeklyMenu")
+    dateCreated = CharField(max_length=20)
+
+    class Meta:
+
+        database = database
+        table_name = "menuHistory"
+        
+class MenuModel(Model):
+    """Model representing the relationship between cameras and cellphones."""
+    id = AutoField(primary_key=True)
+    weeklyMenuId = ForeignKeyField(WeeklyMenuModel, backref="weeklyMenu")
+    day = CharField(max_length=10)
+    hour = CharField(max_length=20)
+    type = CharField(max_length=20)
+
+
+    class Meta:
+        """Class defining properties of the Menu model."""
+        database = database
+        table_name = "menu"
 
 class FavoriteRecipe(Model):
     userId = ForeignKeyField(UserModel, backref="recipes")
@@ -300,6 +258,20 @@ class MenuRecipe(Model):
         database = database
         table_name = "menuRecipe"
 
+
+class GroupModel(Model):
+    """Model representing a book."""
+    id = AutoField(primary_key=True)
+    name = CharField(max_length=50)
+    adminId = ForeignKeyField(UserModel, backref="user")
+    weeklyMenuId = ForeignKeyField(WeeklyMenuModel, backref="weeklyMenu")
+    
+
+    class Meta:
+        """Class defining properties of the BookModel."""
+        database = database
+        table_name = "group"
+
 class GroupMembers(Model):
     groupId = ForeignKeyField(GroupModel,backref="user")
     userId = ForeignKeyField(UserModel,backref="group")
@@ -307,3 +279,15 @@ class GroupMembers(Model):
     class Meta:
         database = database
         table_name = "menuRecipe"
+class CommentModel(Model):
+    """Model representing a Comment."""
+    id = AutoField(primary_key=True)
+    recipeId = ForeignKeyField(RecipeModel, backref="comments")  
+    userId = ForeignKeyField(UserModel, backref="comments")  
+    content = TextField()
+    rating = IntegerField()
+    datePosted = CharField(max_length=10)
+
+    class Meta:
+        database = database
+        table_name = "comment"

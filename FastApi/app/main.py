@@ -7,6 +7,7 @@ and table creation, and includes the route definitions.
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from config.database import database as connection
 #                         CommentModel, RecipeModel, FoodModel,
 #                         GroupModel,IngredientModel,MeasureModel,MenuModel,MenuHistoryModel,
@@ -14,7 +15,7 @@ from config.database import database as connection
 #                         RecipeSuggestionModel,RolesModel,ShoppingListModel,StoreModel,UserModel,
 #                         UserPreferencesModel,WeeklyMenuModel,FavoriteRecipe,RecipeIngredient,
 #                         MenuRecipe,GroupMembers)
-
+from routes.user import router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -42,3 +43,9 @@ async def lifespan(app: FastAPI):
             connection.close()
 
 app = FastAPI(lifespan=lifespan)
+
+@app.get("/", include_in_schema=True)
+async def root():
+    return RedirectResponse("/docs")
+
+app.include_router(router, prefix="/api/user", tags=["user"])
