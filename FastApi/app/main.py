@@ -16,6 +16,7 @@ from config.database import database as connection
 #                         UserPreferencesModel,WeeklyMenuModel,FavoriteRecipe,RecipeIngredient,
 #                         MenuRecipe,GroupMembers)
 from routes.user import router
+from helpers.api_key_auth import get_api_key
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
