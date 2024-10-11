@@ -26,14 +26,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r ./FastApi/requirements.txt  # Instala todas las dependencias listadas en requirements.txt
 
-      - name: Run Pylint on the whole project
+      - name: Run Pylint and capture score
+        id: pylint
         run: |
-          pylint ./**/*.py  # Ejecuta Pylint en todos los archivos Python del proyecto
+          score=$(pylint ./**/*.py --fail-under=0 --output-format=text | grep "Your code has been rated at" | awk '{print $7}' | cut -d/ -f1)
+          echo "Pylint score is $score"
+          echo "::set-output name=score::$score"
 
-      - name: Analysing the code with pylint
+      - name: Check Pylint Score
         run: |
-          if [ ${{ steps.rate.outputs.rate }} -gt 7 ]; then
-            pylint $(git ls-files '*.py')
+          if (( $(echo "${{ steps.pylint.outputs.score }} > 7" | bc -l) )); then
+            echo "Pylint score is greater than 7, proceeding."
           else
-            echo "Rate is not greater than 7. Skipping pylint analysis."
-          fi
+            echo "Pylint score is not greater than 7. Failing the build."
+            exit 1
