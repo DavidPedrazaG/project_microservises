@@ -6,8 +6,6 @@ and table creation, and includes the route definitions.
 """
 
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
 from config.database import database as connection
 #                         CommentModel, RecipeModel, FoodModel,
 #                         GroupModel,IngredientModel,MeasureModel,MenuModel,MenuHistoryModel,
@@ -17,6 +15,9 @@ from config.database import database as connection
 #                         MenuRecipe,GroupMembers)
 from routes.user import router
 from helpers.api_key_auth import get_api_key
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,14 +29,16 @@ async def lifespan(app: FastAPI):
     """
     if connection.is_closed():
         connection.connect()
-        # connection.create_tables([
-        #     CommentModel, RecipeModel, FoodModel,
-        #                 GroupModel,IngredientModel,MeasureModel,MenuModel,MenuHistoryModel,
-        #                 NotificationModel,NutritionalInfoModel,PantryModel,PurchaseHistoryModel,
-        #                 RecipeSuggestionModel,RolesModel,ShoppingListModel,StoreModel,UserModel,
-        #                 UserPreferencesModel,WeeklyMenuModel,FavoriteRecipe,RecipeIngredient,
-        #                 MenuRecipe,GroupMembers
-        # ])
+        # Uncomment the following line to create tables if needed
+        # connection.create_tables([CommentModel, RecipeModel, FoodModel,
+        #                            GroupModel, IngredientModel, MeasureModel,
+        #                            MenuModel, MenuHistoryModel, NotificationModel,
+        #                            NutritionalInfoModel, PantryModel,
+        #                            PurchaseHistoryModel, RecipeSuggestionModel,
+        #                            RolesModel, ShoppingListModel, StoreModel,
+        #                            UserModel, UserPreferencesModel, WeeklyMenuModel,
+        #                            FavoriteRecipe, RecipeIngredient, MenuRecipe,
+        #                            GroupMembers])
 
     try:
         yield
@@ -47,6 +50,12 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/", include_in_schema=True)
 async def root():
+    """
+    Root endpoint redirecting to API documentation.
+
+    Returns:
+        RedirectResponse: The response that redirects to /docs.
+    """
     return RedirectResponse("/docs")
 
 app.include_router(router, prefix="/api/user", tags=["user"])
