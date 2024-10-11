@@ -9,7 +9,7 @@ services:
       - 3307:3307
     volumes:
       - ./MySQL/volumes:/var/lib/mysql
-    hostname: eam_database
+    hostname: bglxizlkk1ves0agpszc-mysql.services.clever-cloud.com
     networks:
       - net_eam_database
     healthcheck:

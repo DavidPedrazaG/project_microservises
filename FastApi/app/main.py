@@ -7,12 +7,13 @@ and table creation, and includes the route definitions.
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from database import (database as connection, CommentModel, RecipeModel, FoodModel,
-                        GroupModel,IngredientModel,MeasureModel,MenuModel,MenuHistoryModel,
-                        NotificationModel,NutritionalInfoModel,PantryModel,PurchaseHistoryModel,
-                        RecipeSuggestionModel,RolesModel,ShoppingListModel,StoreModel,UserModel,
-                        UserPreferencesModel,WeeklyMenuModel,FavoriteRecipe,RecipeIngredient,
-                        MenuRecipe,GroupMembers)
+from config.database import database as connection
+#                         CommentModel, RecipeModel, FoodModel,
+#                         GroupModel,IngredientModel,MeasureModel,MenuModel,MenuHistoryModel,
+#                         NotificationModel,NutritionalInfoModel,PantryModel,PurchaseHistoryModel,
+#                         RecipeSuggestionModel,RolesModel,ShoppingListModel,StoreModel,UserModel,
+#                         UserPreferencesModel,WeeklyMenuModel,FavoriteRecipe,RecipeIngredient,
+#                         MenuRecipe,GroupMembers)
 
 
 @asynccontextmanager
@@ -25,14 +26,14 @@ async def lifespan(app: FastAPI):
     """
     if connection.is_closed():
         connection.connect()
-        connection.create_tables([
-            CommentModel, RecipeModel, FoodModel,
-                        GroupModel,IngredientModel,MeasureModel,MenuModel,MenuHistoryModel,
-                        NotificationModel,NutritionalInfoModel,PantryModel,PurchaseHistoryModel,
-                        RecipeSuggestionModel,RolesModel,ShoppingListModel,StoreModel,UserModel,
-                        UserPreferencesModel,WeeklyMenuModel,FavoriteRecipe,RecipeIngredient,
-                        MenuRecipe,GroupMembers
-        ])
+        # connection.create_tables([
+        #     CommentModel, RecipeModel, FoodModel,
+        #                 GroupModel,IngredientModel,MeasureModel,MenuModel,MenuHistoryModel,
+        #                 NotificationModel,NutritionalInfoModel,PantryModel,PurchaseHistoryModel,
+        #                 RecipeSuggestionModel,RolesModel,ShoppingListModel,StoreModel,UserModel,
+        #                 UserPreferencesModel,WeeklyMenuModel,FavoriteRecipe,RecipeIngredient,
+        #                 MenuRecipe,GroupMembers
+        # ])
 
     try:
         yield
@@ -41,8 +42,3 @@ async def lifespan(app: FastAPI):
             connection.close()
 
 app = FastAPI(lifespan=lifespan)
-
-app.include_router(book_route, prefix="/api/books", tags=["books"])
-app.include_router(cellphone_route, prefix="/api/cellphones", tags=["cellphones"])
-app.include_router(camera_route, prefix="/api/cameras", tags=["cameras"])
-app.include_router(author_router, prefix="/api/authors", tags=["authors"])

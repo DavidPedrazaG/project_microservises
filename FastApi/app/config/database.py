@@ -1,22 +1,18 @@
 """
 Module for defining database models using the Peewee ORM.
 """
-
-import os
 from dotenv import load_dotenv
-from peewee import (
-    Model, AutoField, CharField,
-    IntegerField, DecimalField,
-    ForeignKeyField, MySQLDatabase
-)
+from peewee import *
+from config.settings import DATABASE
 
 load_dotenv()
 
 database = MySQLDatabase(
-    os.getenv('DB_NAME'),
-    user=os.getenv('DB_USER'),
-    password=os.getenv('DB_PASSWORD'),
-    host=os.getenv('DB_HOST'),
+    DATABASE["name"],
+    user=DATABASE["user"],
+    passwd=DATABASE["password"],
+    host=DATABASE["host"],
+    port=DATABASE["port"],
 )
 
 class CommentModel(Model):
@@ -24,7 +20,7 @@ class CommentModel(Model):
     id = AutoField(primary_key=True)
     recipeId = ForeignKeyField('RecipeModel', backref="comments")  
     userId = ForeignKeyField('UserModel', backref="comments")  
-    content = CharField()
+    content = TextField()
     rating = IntegerField()
     datePosted = CharField(max_length=10)
 
@@ -42,14 +38,14 @@ class RecipeModel(Model):
     typeOfFood = CharField(max_length=50)
     preparationTime = IntegerField()
     nutritionalInfoId = IntegerField()
-    images = ForeignKeyField(Author, backref="books")
+    images = TextField()
     preparationProcess = CharField(max_length=50)
     
 
     class Meta:
         """Class defining properties of the RecipeModel."""
         database = database
-        table_name = "Recipe"
+        table_name = "recipe"
 
 
 
@@ -198,7 +194,7 @@ class PurchaseHistoryModel(Model):
 class RecipeSuggestionModel(Model):
     id = AutoField(primary_key=True)
     userId = ForeignKeyField('UserModel', backref="books")
-    suggestedRecipeId = ForeignKeyField(sugg, backref="books")
+    suggestedRecipeId = ForeignKeyField(RecipeModel, backref="books")
     matchedIngredientId= ForeignKeyField(IngredientModel, backref="ingredient")
     missingIngredientesId = ForeignKeyField(IngredientModel, backref="ingredient")
     dateSuggested = CharField(max_length=50)
