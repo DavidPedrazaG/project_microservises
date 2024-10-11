@@ -1,13 +1,16 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Text, create_engine
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from config.settings import DATABASE
 
 Base = declarative_base()
 
-# CommentModel
+# pylint: disable=too-few-public-methods
+
+# Database models
+
 class CommentModel(Base):
+    """Model for recipe comments."""
     __tablename__ = 'comment'
     id = Column(Integer, primary_key=True, autoincrement=True)
     recipeId = Column(Integer, ForeignKey('recipe.id'))
@@ -20,8 +23,8 @@ class CommentModel(Base):
     user = relationship("UserModel", back_populates="comments")
 
 
-# RecipeModel
 class RecipeModel(Base):
+    """Model for recipes."""
     __tablename__ = 'recipe'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50))
@@ -34,8 +37,8 @@ class RecipeModel(Base):
     comments = relationship("CommentModel", back_populates="recipe")
 
 
-# FoodModel
 class FoodModel(Base):
+    """Model for foods."""
     __tablename__ = 'food'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50))
@@ -43,8 +46,8 @@ class FoodModel(Base):
     micronutrientsId = Column(Integer)
 
 
-# GroupModel
 class GroupModel(Base):
+    """Model for user groups."""
     __tablename__ = 'group'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50))
@@ -52,26 +55,26 @@ class GroupModel(Base):
     weeklyMenuId = Column(Integer, ForeignKey('weeklyMenu.id'))
 
 
-# IngredientModel
 class IngredientModel(Base):
+    """Model for ingredients."""
     __tablename__ = 'ingredient'
     id = Column(Integer, primary_key=True, autoincrement=True)
     foodId = Column(Integer, ForeignKey('food.id'))
     quantity = Column(Integer)
     measurementUnit = Column(String(50))
     expirationDate = Column(String(50))
-    meassure = Column(Integer)
+    measure = Column(Integer)  # The name is not changed as requested
 
 
-# MeasureModel
 class MeasureModel(Base):
+    """Model for measures."""
     __tablename__ = 'measure'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50))
 
 
-# MenuModel
 class MenuModel(Base):
+    """Model for weekly menus."""
     __tablename__ = 'menu'
     id = Column(Integer, primary_key=True, autoincrement=True)
     weeklyMenuId = Column(Integer, ForeignKey('weeklyMenu.id'))
@@ -80,8 +83,8 @@ class MenuModel(Base):
     type = Column(String(20))
 
 
-# MenuHistoryModel
 class MenuHistoryModel(Base):
+    """Model for menu history."""
     __tablename__ = 'menuHistory'
     id = Column(Integer, primary_key=True, autoincrement=True)
     userId = Column(Integer, ForeignKey('user.id'))
@@ -89,8 +92,8 @@ class MenuHistoryModel(Base):
     dateCreated = Column(String(20))
 
 
-# NotificationModel
 class NotificationModel(Base):
+    """Model for user notifications."""
     __tablename__ = 'notification'
     id = Column(Integer, primary_key=True, autoincrement=True)
     userId = Column(Integer, ForeignKey('user.id'))
@@ -99,8 +102,8 @@ class NotificationModel(Base):
     type = Column(String(20))
 
 
-# NutritionalInfoModel
 class NutritionalInfoModel(Base):
+    """Model for nutritional information."""
     __tablename__ = 'nutritionalInfo'
     id = Column(Integer, primary_key=True, autoincrement=True)
     calories = Column(Integer)
@@ -111,8 +114,8 @@ class NutritionalInfoModel(Base):
     minerals = Column(String(50))
 
 
-# PantryModel
 class PantryModel(Base):
+    """Model for user pantry."""
     __tablename__ = 'pantry'
     id = Column(Integer, primary_key=True, autoincrement=True)
     userId = Column(Integer, ForeignKey('user.id'))
@@ -120,8 +123,8 @@ class PantryModel(Base):
     dateLastUpdated = Column(String(50))
 
 
-# PurchaseHistoryModel
 class PurchaseHistoryModel(Base):
+    """Model for purchase history."""
     __tablename__ = 'purchaseHistory'
     id = Column(Integer, primary_key=True, autoincrement=True)
     userId = Column(Integer, ForeignKey('user.id'))
@@ -129,8 +132,8 @@ class PurchaseHistoryModel(Base):
     purchaseDate = Column(String(50))
 
 
-# RecipeSuggestionModel
 class RecipeSuggestionModel(Base):
+    """Model for recipe suggestions."""
     __tablename__ = 'recipeSuggestion'
     id = Column(Integer, primary_key=True, autoincrement=True)
     userId = Column(Integer, ForeignKey('user.id'))
@@ -140,15 +143,15 @@ class RecipeSuggestionModel(Base):
     dateSuggested = Column(String(50))
 
 
-# RolesModel
 class RolesModel(Base):
+    """Model for user roles."""
     __tablename__ = 'roles'
     id = Column(Integer, primary_key=True, autoincrement=True)
     roleName = Column(String(50))
 
 
-# ShoppingListModel
 class ShoppingListModel(Base):
+    """Model for shopping lists."""
     __tablename__ = 'shoppingList'
     id = Column(Integer, primary_key=True, autoincrement=True)
     userId = Column(Integer, ForeignKey('user.id'))
@@ -156,8 +159,8 @@ class ShoppingListModel(Base):
     dateCreated = Column(String(20))
 
 
-# StoreModel
 class StoreModel(Base):
+    """Model for ingredient stores."""
     __tablename__ = 'store'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50))
@@ -165,8 +168,8 @@ class StoreModel(Base):
     inventoryId = Column(Integer, ForeignKey('pantry.id'))
 
 
-# UserModel
 class UserModel(Base):
+    """Model for users."""
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True, autoincrement=True)
     cc = Column(String(20))
@@ -178,8 +181,8 @@ class UserModel(Base):
     role = Column(Integer)
 
 
-# UserPreferencesModel
 class UserPreferencesModel(Base):
+    """Model for user preferences."""
     __tablename__ = 'userPreferences'
     id = Column(Integer, primary_key=True, autoincrement=True)
     userId = Column(Integer, ForeignKey('user.id'))
@@ -188,47 +191,48 @@ class UserPreferencesModel(Base):
     allergens = Column(String(50))
 
 
-# WeeklyMenuModel
 class WeeklyMenuModel(Base):
+    """Model for weekly menus."""
     __tablename__ = 'weeklyMenu'
     id = Column(Integer, primary_key=True, autoincrement=True)
 
 
-# FavoriteRecipeModel
 class FavoriteRecipeModel(Base):
+    """Model for users' favorite recipes."""
     __tablename__ = 'favoriteRecipe'
     userId = Column(Integer, ForeignKey('user.id'), primary_key=True)
     recipeId = Column(Integer, ForeignKey('recipe.id'), primary_key=True)
 
 
-# RecipeIngredientModel
 class RecipeIngredientModel(Base):
+    """Model for recipe ingredients."""
     __tablename__ = 'recipeIngredient'
     recipeId = Column(Integer, ForeignKey('recipe.id'), primary_key=True)
     ingredientId = Column(Integer, ForeignKey('ingredient.id'), primary_key=True)
 
 
-# MenuRecipeModel
 class MenuRecipeModel(Base):
+    """Model for recipes in menus."""
     __tablename__ = 'menuRecipe'
     menuId = Column(Integer, ForeignKey('menu.id'), primary_key=True)
     recipeId = Column(Integer, ForeignKey('recipe.id'), primary_key=True)
 
 
-# GroupMembersModel
 class GroupMembersModel(Base):
+    """Model for group members."""
     __tablename__ = 'groupMembers'
     groupId = Column(Integer, ForeignKey('group.id'), primary_key=True)
     userId = Column(Integer, ForeignKey('user.id'), primary_key=True)
 
+# Database configuration
 DATABASE_URL = f"mysql+pymysql://{DATABASE['user']}:{DATABASE['password']}@{DATABASE['host']}/{DATABASE['name']}"
 engine = create_engine(DATABASE_URL)
 
-
-# Crear una sesión de base de datos
+# Create a database session
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db():
+    """Database session generator."""
     db = SessionLocal()
     try:
         yield db
